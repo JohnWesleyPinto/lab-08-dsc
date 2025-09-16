@@ -1,12 +1,14 @@
 package br.ufpb.dcx.dsc.repositorios.services;
 
+import br.ufpb.dcx.dsc.repositorios.exceptions.BusinessException;
+import br.ufpb.dcx.dsc.repositorios.exceptions.ResourceNotFoundException;
 import br.ufpb.dcx.dsc.repositorios.models.Photo;
 import br.ufpb.dcx.dsc.repositorios.models.User;
 import br.ufpb.dcx.dsc.repositorios.repository.PhotoRepository;
 import br.ufpb.dcx.dsc.repositorios.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -25,14 +27,18 @@ public class UserService {
         return userRepository.findAll();
     }
     public User getUser(Long userId) {
-
-        if(userId != null)
-            return userRepository.getReferenceById(userId);
-        return null;
+        if (userId == null) {
+            throw new BusinessException("O identificador do usuário não pode ser nulo.");
+        }
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o id " + userId + "."));
     }
 
     public User createUser(User user){
 
+        if (user == null) {
+            throw new BusinessException("Os dados do usuário são obrigatórios.");
+        }
         Photo photo = new Photo("www.exemplo.com/foto.png");
         photoRepository.save(photo);
         user.setPhoto(photo);
@@ -40,6 +46,12 @@ public class UserService {
     }
 
     public User updateUser(Long userId, User u) {
+        if (userId == null) {
+            throw new BusinessException("O identificador do usuário não pode ser nulo.");
+        }
+        if (u == null) {
+            throw new BusinessException("Os dados do usuário são obrigatórios.");
+        }
         Optional<User> userOpt = userRepository.findById(userId);
         if(userOpt.isPresent()){
             User user = userOpt.get();
@@ -47,10 +59,16 @@ public class UserService {
             user.setNome(u.getNome());
             return userRepository.save(user);
         }
-        return null;
+        throw new ResourceNotFoundException("Usuário não encontrado para o id " + userId + ".");
     }
 
     public void deleteUser(Long userId) {
+        if (userId == null) {
+            throw new BusinessException("O identificador do usuário não pode ser nulo.");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o id " + userId + "."));
+        userRepository.delete(user);
     /*    Optional<User> uOpt = userRepository.findById(userId);
         User u = uOpt.get();
         if(uOpt.isPresent()){

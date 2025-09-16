@@ -6,13 +6,16 @@ import br.ufpb.dcx.dsc.repositorios.services.RepositorioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api")
+@Validated
 public class RepositorioController {
 
     private ModelMapper modelMapper;
@@ -24,7 +27,7 @@ public class RepositorioController {
     }
 
     @GetMapping(path = "/repositorio/{repoId}")
-    public RepositorioDTO getRepositorio(@PathVariable Long repoId) {
+    public RepositorioDTO getRepositorio(@PathVariable @Min(1) Long repoId) {
         Repositorio t = repositorioService.getRepositorio(repoId);
         return convertToDTO(t);
     }
@@ -36,7 +39,7 @@ public class RepositorioController {
     }
 
     @PostMapping("/organizacao/{orgId}/repositorio")
-    public RepositorioDTO createRepositorio(@Valid @PathVariable Long orgId, @RequestBody RepositorioDTO repoDTO) {
+    public RepositorioDTO createRepositorio(@PathVariable @Min(1) Long orgId, @Validated @RequestBody RepositorioDTO repoDTO) {
         Repositorio r = convertToEntity(repoDTO);
         Repositorio repoCreated = repositorioService.saveRepositorio(r, orgId);
         System.out.println(repoCreated);
@@ -44,7 +47,7 @@ public class RepositorioController {
     }
 
     @PutMapping("/repositorio/{repoId}")
-    public RepositorioDTO updateRepositorio(@PathVariable Long repoId, @RequestBody RepositorioDTO repoDTO) {
+    public RepositorioDTO updateRepositorio(@PathVariable @Min(1) Long repoId,@Validated @RequestBody RepositorioDTO repoDTO) {
         Repositorio t = convertToEntity(repoDTO);
         Repositorio taskCreated = repositorioService.updateRepositorio(repoId, t);
         return convertToDTO(taskCreated);
@@ -52,7 +55,7 @@ public class RepositorioController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/repositorio/{repoId}")
-    public void deleteRepositorio(@PathVariable Long repoId) {
+    public void deleteRepositorio(@PathVariable @Min(1) Long repoId) {
         repositorioService.deleteRepositorio(repoId);
     }
 

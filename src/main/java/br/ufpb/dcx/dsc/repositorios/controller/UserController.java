@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.util.List;
 
+
 @RestController
 @RequestMapping(path = "/api")
 @Validated
@@ -31,11 +32,10 @@ public class UserController {
     }
 
     @GetMapping("/user/{userId}")
-    public UserDTO getUser(@PathVariable @Min(0) Long userId){
+    public UserDTO getUser(@PathVariable @Min(1) Long userId){
         User user = userService.getUser(userId);
         return convertToDTO(user);
     }
-
 
     @PostMapping(path = "/user")
     UserDTO createUser(@Valid @RequestBody UserDTO userDTO){
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PutMapping("/user/{userId}")
-    public UserDTO updateTask(@PathVariable Long userId, @RequestBody UserDTO userDTO){
+    public UserDTO updateTask(@PathVariable @Min(1) Long userId, @Validated @RequestBody UserDTO userDTO){
 
         User u = convertToEntity(userDTO);
         User userUpdated = userService.updateUser(userId, u);
@@ -54,7 +54,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/user/{userId}")
-    public void deleteUser(@PathVariable Long userId){
+    public void deleteUser(@PathVariable @Min(1) Long userId){
         userService.deleteUser(userId);
     }
 
